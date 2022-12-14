@@ -1,0 +1,8 @@
+{
+  "name": "Triple 4s",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "f3ba9fc8"
+}
