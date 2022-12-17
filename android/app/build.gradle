@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    namespace 'technology.swiftlet.triple4s'
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "technology.swiftlet.triple4s"
