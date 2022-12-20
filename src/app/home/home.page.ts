@@ -124,7 +124,7 @@ export class HomePage implements OnInit {
     if(number) {
       // Get GPS location
       const coordinates = await Geolocation.getCurrentPosition();
-      let coordStr = "http://maps.google.com/maps?q=" + coordinates.coords.longitude +"," + coordinates.coords.latitude;
+      let coordStr = "http://maps.google.com/maps?q=" + coordinates.coords.latitude +"," + coordinates.coords.longitude;
       let str = "Attention! " + name + " has triggered their Triple4s pepper spray at " + coordStr;
       this.sms.send(number, str);
     }

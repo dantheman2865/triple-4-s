@@ -47,6 +47,8 @@
 	<string>Connect to Triple 4s devices</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Connect to Triple 4s devices</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Share your location with a specified contact</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 </dict>
