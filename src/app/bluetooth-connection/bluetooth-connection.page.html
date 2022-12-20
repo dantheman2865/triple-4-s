@@ -16,7 +16,7 @@
 
 <ion-content>
   <ion-list> 
-    <ion-item click="" device="" deviceselected="" *ngFor="let device of devices">
+    <ion-item (click)="BleConnect(device)" *ngFor="let device of devices">
       <ion-label>
       <h2>{{ device.name || 'Unnamed' }}</h2>
         {{ device.id }}

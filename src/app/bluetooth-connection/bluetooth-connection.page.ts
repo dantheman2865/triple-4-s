@@ -1,7 +1,9 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 import { BLE } from '@awesome-cordova-plugins/ble/ngx';
+import { Preferences } from '@capacitor/preferences';
 import { ToastController } from '@ionic/angular';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Component({
   selector: 'app-bluetooth-connection',
@@ -11,6 +13,8 @@ import { ToastController } from '@ionic/angular';
 export class BluetoothConnectionPage implements OnInit {
   public statusMessage: string;
   public devices: any[];
+  peripheral: any = {};
+
 
   constructor(
     private toastCtrl: ToastController,
@@ -40,7 +44,8 @@ export class BluetoothConnectionPage implements OnInit {
         this.androidPermissions.PERMISSION.BLUETOOTH, 
         this.androidPermissions.PERMISSION.BLUETOOTH_ADMIN, 
         this.androidPermissions.PERMISSION.BLUETOOTH_SCAN,
-        this.androidPermissions.PERMISSION.BLUETOOTH_CONNECT
+        this.androidPermissions.PERMISSION.BLUETOOTH_CONNECT,
+        this.androidPermissions.PERMISSION.SEND_SMS
       ]
     ).then(() => {
       this.ble.scan([], 5).subscribe(
@@ -74,4 +79,45 @@ export class BluetoothConnectionPage implements OnInit {
     });
   }
 
+  BleConnect(device: any) {
+    const observer = {
+      next: (x: any) => this.onConnected(x),
+      error: (err: any) => this.onDeviceDisconnected(err),
+      complete: () => console.log('Observer got a complete notification'),
+    };
+    this.ble.autoConnect(device.id, this.onConnected.bind(this), this.onDeviceDisconnected.bind(this));
+  }
+
+  BleDisconnect() {
+    this.ble.disconnect(this.peripheral.id).then(
+      () => console.log('Disconnected ' + JSON.stringify(this.peripheral)),
+      () => console.log('ERROR disconnecting ' + JSON.stringify(this.peripheral))
+    );
+  }
+
+
+  onConnected(peripheral: any) {
+    console.log(peripheral)
+    Preferences.set({
+      key: 'deviceId',
+      value: peripheral.id
+    });
+    this.setStatus('Connected!');
+    this.peripheral = peripheral;
+  }
+
+  async onDeviceDisconnected(peripheral: any) {
+    const toast = await this.toastCtrl.create({
+      message: 'The peripheral unexpectedly disconnected',
+      duration: 3000,
+      position: 'middle'
+    });
+    toast.present();
+  }
+
+  // Disconnect peripheral when leaving the page
+  ionViewWillLeave() {
+  console.log('ionViewWillLeave disconnecting Bluetooth');
+    this.BleDisconnect();
+  }
 }
