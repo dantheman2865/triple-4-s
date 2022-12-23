@@ -96,7 +96,7 @@ export class BluetoothConnectionPage implements OnInit {
   }
 
 
-  onConnected(peripheral: any) {
+  async onConnected(peripheral: any) {
     console.log(peripheral)
     Preferences.set({
       key: 'deviceId',
@@ -104,6 +104,12 @@ export class BluetoothConnectionPage implements OnInit {
     });
     this.setStatus('Connected!');
     this.peripheral = peripheral;
+    const toast = await this.toastCtrl.create({
+      message: 'Device connected and saved',
+      duration: 3000,
+      position: 'middle'
+    });
+    toast.present();
   }
 
   async onDeviceDisconnected(peripheral: any) {

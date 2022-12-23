@@ -23,7 +23,7 @@ export class HomePage implements OnInit {
     private androidPermissions: AndroidPermissions,
   ) { 
     const slowNotify = this.notifier.pipe(
-      throttle(() => interval(30000))
+      throttle(() => interval(3000))
     );
     slowNotify.subscribe(x => {
       this.triggered(true);
@@ -31,22 +31,23 @@ export class HomePage implements OnInit {
   }
 
   async ngOnInit() {
-    this.androidPermissions.requestPermissions(
-      [
-        this.androidPermissions.PERMISSION.BLUETOOTH, 
-        this.androidPermissions.PERMISSION.BLUETOOTH_ADMIN, 
-        this.androidPermissions.PERMISSION.BLUETOOTH_SCAN,
-        this.androidPermissions.PERMISSION.BLUETOOTH_CONNECT,
-        this.androidPermissions.PERMISSION.SEND_SMS,
-        this.androidPermissions.PERMISSION.ACCESS_COARSE_LOCATION,
-        this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
-      ]
-    ).then(async () => {
+    // this.androidPermissions.requestPermissions(
+    //   [
+    //     this.androidPermissions.PERMISSION.BLUETOOTH, 
+    //     this.androidPermissions.PERMISSION.BLUETOOTH_ADMIN, 
+    //     this.androidPermissions.PERMISSION.BLUETOOTH_SCAN,
+    //     this.androidPermissions.PERMISSION.BLUETOOTH_CONNECT,
+    //     this.androidPermissions.PERMISSION.SEND_SMS,
+    //     this.androidPermissions.PERMISSION.ACCESS_COARSE_LOCATION,
+    //     this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
+    //   ]
+    // ).then(async () => {
+      Geolocation.getCurrentPosition();
       let deviceId = await (await Preferences.get({ key: 'deviceId' })).value;
       if(deviceId) {
         this.BleConnect(deviceId);
       }
-    });
+    // });
     this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION).then(
       result => console.log('Has permission?',result.hasPermission),
       err => this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION)
@@ -77,7 +78,7 @@ export class HomePage implements OnInit {
   }
 
 
-  onConnected(peripheral: any) {
+  async onConnected(peripheral: any) {
     console.log(JSON.stringify(peripheral))
     this.peripheral = peripheral;
     this.ble.startNotification(peripheral.id, "ce4638f8-c4de-f1b0-1542-f3a5a09c68cd", "0001")
@@ -85,6 +86,12 @@ export class HomePage implements OnInit {
         next: (x: any) => this.onDeviceNotify(x),
         error: (err: any) => console.log("Error: " + JSON.stringify(err))
       });
+    const toast = await this.toastCtrl.create({
+      message: 'Device connected!',
+      duration: 3000,
+      position: 'middle'
+    });
+    toast.present();
   }
 
   async onDeviceDisconnected(peripheral: any) {
